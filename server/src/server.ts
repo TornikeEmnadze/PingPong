@@ -14,30 +14,27 @@ const app = express();
 const server = createServer(app);
 const clientBuildPath = path.join(__dirname, "..", "..", "client", "dist");
 
+
 console.log(`Serving client static files from: ${clientBuildPath}`);
 app.use(express.static(clientBuildPath));
 
-app.get("*", (req, res) => {
-  console.log(`Serving index.html for request: ${req.method} ${req.path}`);
-  res.sendFile(path.join(clientBuildPath, "index.html"), (err) => {
-    if (err) {
-      console.error("Error serving index.html:", err);
-      if (!res.headersSent) {
-        res.status(500).send("Error loading the game.");
-      }
-    } else {
-      console.log("Successfully served index.html");
-    }
-  });
+app.get('*', (req, res) => {
+    console.log(`Serving index.html for request: ${req.method} ${req.path}`);
+    res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
+        if (err) {
+            console.error('Error serving index.html:', err);
+             if (!res.headersSent) {
+                res.status(500).send('Error loading the game.');
+            }
+        } else {
+             console.log('Successfully served index.html');
+        }
+    });
 });
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: {
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://51.20.114.126:3001",
-    ],
+    origin: ["http://localhost:3000", "http://localhost:5173", "http://51.20.114.126:3001"],
     methods: ["GET", "POST"],
   },
 });
