@@ -14,7 +14,8 @@ app.use(cors());
 const server = createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"], // Support both CRA and Vite
+    // ADD your EC2 public IP and port (3001) to the origin list
+    origin: ["http://localhost:3000", "http://localhost:5173", "http://51.20.114.126:3001"],
     methods: ["GET", "POST"],
   },
 });
