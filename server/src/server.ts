@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import path from "path";
 import { Game } from "./models/Game";
 import {
   ServerToClientEvents,
@@ -9,13 +10,34 @@ import {
 } from "../../client/shared/types/events";
 
 const app = express();
-app.use(cors());
 
 const server = createServer(app);
+const clientBuildPath = path.join(__dirname, "..", "..", "client", "dist");
+
+console.log(`Serving client static files from: ${clientBuildPath}`);
+app.use(express.static(clientBuildPath));
+
+app.get("*", (req, res) => {
+  console.log(`Serving index.html for request: ${req.method} ${req.path}`);
+  res.sendFile(path.join(clientBuildPath, "index.html"), (err) => {
+    if (err) {
+      console.error("Error serving index.html:", err);
+      if (!res.headersSent) {
+        res.status(500).send("Error loading the game.");
+      }
+    } else {
+      console.log("Successfully served index.html");
+    }
+  });
+});
+
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: {
-    // ADD your EC2 public IP and port (3001) to the origin list
-    origin: ["http://localhost:3000", "http://localhost:5173", "http://51.20.114.126:3001"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://51.20.114.126:3001",
+    ],
     methods: ["GET", "POST"],
   },
 });
@@ -72,4 +94,5 @@ setInterval(() => {
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Access the game at: http://51.20.114.126:${PORT}`); // Add helpful message
 });
