@@ -14,20 +14,39 @@ const app = express();
 const server = createServer(app);
 const clientBuildPath = path.join(__dirname, "..", "..", "client", "dist");
 
-
 console.log(`Serving client static files from: ${clientBuildPath}`);
 app.use(express.static(clientBuildPath));
 
-app.get('*', (req, res) => { 
+// Replace the problematic wildcard route
+app.get('/', (req, res) => {
     console.log(`Serving index.html for request: ${req.method} ${req.path}`);
     res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
         if (err) {
             console.error('Error serving index.html:', err);
-             if (!res.headersSent) {
+            if (!res.headersSent) {
                 res.status(500).send('Error loading the game.');
             }
         } else {
-             console.log('Successfully served index.html');
+            console.log('Successfully served index.html');
+        }
+    });
+});
+
+app.use((req, res, next) => {
+    // Skip if it's an API route or static file request
+    if (req.path.startsWith('/api') || req.path.includes('.')) {
+        return next();
+    }
+    
+    console.log(`Serving index.html for SPA route: ${req.method} ${req.path}`);
+    res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
+        if (err) {
+            console.error('Error serving index.html:', err);
+            if (!res.headersSent) {
+                res.status(500).send('Error loading the game.');
+            }
+        } else {
+            console.log('Successfully served index.html');
         }
     });
 });
@@ -91,5 +110,5 @@ setInterval(() => {
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Access the game at: http://51.20.114.126:${PORT}`); // Add helpful message
+  console.log(`Access the game at: http://51.20.114.126:${PORT}`);
 });
