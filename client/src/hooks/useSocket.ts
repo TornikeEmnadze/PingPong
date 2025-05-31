@@ -12,15 +12,21 @@ export const useSocket = () => {
   > | null>(null);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3001");
+    // Read the server URL from the environment variable set in .env BEFORE build
+    // If VITE_SERVER_URL is not set (e.g., during local dev without a .env file),
+    // fall back to localhost for convenience.
+    const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+    console.log('Connecting socket to:', serverUrl); // Log the URL being used
+
+    const newSocket = io(serverUrl); // <-- Use the configured URL
 
     setSocket(newSocket);
 
     return () => {
-      console.log("Disconnecting socket..."); // Add log for clarity
+      console.log('Disconnecting socket...');
       newSocket.disconnect();
     };
-  }, []);
+  }, []); // Empty dependency array: runs once on mount
 
   return socket;
 };
