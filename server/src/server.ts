@@ -18,7 +18,7 @@ const clientBuildPath = path.join(__dirname, "..", "..", "client", "dist");
 console.log(`Serving client static files from: ${clientBuildPath}`);
 app.use(express.static(clientBuildPath));
 
-app.get('*', (req, res) => {
+app.get('*', (req, res) => { 
     console.log(`Serving index.html for request: ${req.method} ${req.path}`);
     res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
         if (err) {
