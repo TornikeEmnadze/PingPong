@@ -132,3 +132,29 @@ jobs:
           echo "❌ Deployment failed - rolling back to previous environment"
           # Revert traffic to previous environment
 
+  # Status check - this job runs last and ensures all required checks passed
+  pipeline-status:
+    name: Pipeline Status Check
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [test, build]
+    steps:
+      - name: Check test job status
+        if: needs.test.result != 'success'
+        run: |
+          echo "❌ TEST JOB FAILED"
+          echo "Tests must pass before merging"
+          exit 1
+
+      - name: Check build job status
+        if: needs.build.result != 'success'
+        run: |
+          echo "❌ BUILD JOB FAILED"
+          echo "Build must succeed before merging"
+          exit 1
+
+      - name: Pipeline Status Success
+        if: success()
+        run: |
+          echo "✅ All required checks passed!"
+          echo "This PR is safe to merge"
