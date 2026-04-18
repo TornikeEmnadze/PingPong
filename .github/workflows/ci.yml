@@ -12,65 +12,87 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
 
-      # Client tests and linting
       - name: Install client dependencies
-        run: cd client && npm ci
+        working-directory: client
+        run: npm ci
+
       - name: Lint client
-        run: cd client && npm run lint
+        working-directory: client
+        run: npm run lint
+
       - name: Test client
-        run: cd client && npm test -- --run
+        working-directory: client
+        run: npm test -- --run
 
-      # Server tests
       - name: Install server dependencies
-        run: cd server && npm ci
-      - name: Test server
-        run: cd server && npm test -- --coverage
+        working-directory: server
+        run: npm ci
 
-      # Upload coverage reports
+      - name: Test server
+        working-directory: server
+        run: npm test -- --coverage
+
       - name: Upload server coverage
-        if: always()
+        if: always() && hashFiles('server/coverage/coverage-final.json') != ''
         uses: codecov/codecov-action@v4
         with:
           files: ./server/coverage/coverage-final.json
           flags: server
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     runs-on: ubuntu-latest
     needs: test
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
 
       - name: Build client
-        run: cd client && npm ci && npm run build
+        working-directory: client
+        run: npm run build
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
 
       - name: Build server
-        run: cd server && npm ci && npm run build
+        working-directory: server
+        run: npm run build
 
-      # Build Docker images
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: false
           tags: pingpong:latest
-          cache-from: type=registry,ref=pingpong:buildcache
-          cache-to: type=registry,ref=pingpong:buildcache,mode=max
 
-      # Upload build artifacts
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: |
@@ -78,21 +100,20 @@ jobs:
             client/dist
           retention-days: 7
 
-  # Blue-Green Deployment (only on main push)
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: build
     strategy:
       matrix:
-        environment: [green]  # Deploy to green first
+        environment: [green]
     environment:
       name: production-${{ matrix.environment }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifacts
 
@@ -102,23 +123,14 @@ jobs:
           echo "Version: ${{ github.sha }}"
           echo "Build number: ${{ github.run_number }}"
 
-          # In production, you would:
-          # 1. Connect to your infrastructure (AWS, GCP, etc.)
-          # 2. Deploy to the inactive environment
-          # 3. Run health checks and smoke tests
-          # 4. If successful, switch traffic
-          # 5. If failed, keep old environment active
-
       - name: Run smoke tests
         run: |
           echo "Running smoke tests on ${{ matrix.environment }}..."
-          # Add your smoke test commands here
 
-      - name: Switch traffic (if tests pass)
+      - name: Switch traffic
         if: success()
         run: |
           echo "Switching traffic to ${{ matrix.environment }} environment..."
-          # Update load balancer or infrastructure configuration
 
       - name: Verify deployment
         if: success()
@@ -130,9 +142,7 @@ jobs:
         if: failure()
         run: |
           echo "❌ Deployment failed - rolling back to previous environment"
-          # Revert traffic to previous environment
 
-  # Status check - this job runs last and ensures all required checks passed
   pipeline-status:
     name: Pipeline Status Check
     runs-on: ubuntu-latest
@@ -154,7 +164,7 @@ jobs:
           exit 1
 
       - name: Pipeline Status Success
-        if: success()
+        if: needs.test.result == 'success' && needs.build.result == 'success'
         run: |
           echo "✅ All required checks passed!"
           echo "This PR is safe to merge"
