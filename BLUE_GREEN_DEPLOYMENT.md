@@ -47,7 +47,7 @@ Deployment Cycle:
 ✅ **Zero Downtime**: Traffic switches instantly  
 ✅ **Fast Rollback**: Keep old version ready to serve immediately  
 ✅ **Easy Testing**: Full production environment testing before switch  
-✅ **Reduced Risk**: Easy to validate before traffic switch  
+✅ **Reduced Risk**: Easy to validate before traffic switch
 
 ## Local Simulation
 
@@ -106,6 +106,7 @@ curl http://localhost:3001/health
 ```
 
 Response:
+
 ```json
 {
   "status": "healthy",
@@ -182,11 +183,11 @@ deploy:
   needs: [test, build]
   steps:
     - name: Deploy to inactive environment
-      run: npm run deploy:green  # Or deploy:blue
-    
+      run: npm run deploy:green # Or deploy:blue
+
     - name: Run smoke tests
       run: npm run test:smoke
-    
+
     - name: Switch traffic
       run: npm run deploy:switch
 ```
@@ -246,16 +247,19 @@ npm run deploy:simulate
 ## Troubleshooting
 
 ### Health checks failing?
+
 - Ensure servers are running on configured ports
 - Check logs: `npm run logs:blue` or `npm run logs:green`
 - Verify endpoints are accessible: `curl http://localhost:3001/health`
 
 ### Traffic not switching?
+
 - Verify load balancer configuration
 - Check deployment state file: `cat .deployment-state.json`
 - Manual switch: Update upstream in nginx/load balancer config
 
 ### Slow deployments?
+
 - Check build time: `npm run build -- --profile`
 - Optimize dependencies
 - Use incremental builds where possible

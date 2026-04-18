@@ -22,42 +22,46 @@ app.use(express.static(clientBuildPath));
 setupHealthCheck(app);
 
 // Replace the problematic wildcard route
-app.get('/', (req, res) => {
-    console.log(`Serving index.html for request: ${req.method} ${req.path}`);
-    res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
-        if (err) {
-            console.error('Error serving index.html:', err);
-            if (!res.headersSent) {
-                res.status(500).send('Error loading the game.');
-            }
-        } else {
-            console.log('Successfully served index.html');
-        }
-    });
+app.get("/", (req, res) => {
+  console.log(`Serving index.html for request: ${req.method} ${req.path}`);
+  res.sendFile(path.join(clientBuildPath, "index.html"), (err) => {
+    if (err) {
+      console.error("Error serving index.html:", err);
+      if (!res.headersSent) {
+        res.status(500).send("Error loading the game.");
+      }
+    } else {
+      console.log("Successfully served index.html");
+    }
+  });
 });
 
 app.use((req, res, next) => {
-    // Skip if it's an API route or static file request
-    if (req.path.startsWith('/api') || req.path.includes('.')) {
-        return next();
+  // Skip if it's an API route or static file request
+  if (req.path.startsWith("/api") || req.path.includes(".")) {
+    return next();
+  }
+
+  console.log(`Serving index.html for SPA route: ${req.method} ${req.path}`);
+  res.sendFile(path.join(clientBuildPath, "index.html"), (err) => {
+    if (err) {
+      console.error("Error serving index.html:", err);
+      if (!res.headersSent) {
+        res.status(500).send("Error loading the game.");
+      }
+    } else {
+      console.log("Successfully served index.html");
     }
-    
-    console.log(`Serving index.html for SPA route: ${req.method} ${req.path}`);
-    res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
-        if (err) {
-            console.error('Error serving index.html:', err);
-            if (!res.headersSent) {
-                res.status(500).send('Error loading the game.');
-            }
-        } else {
-            console.log('Successfully served index.html');
-        }
-    });
+  });
 });
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173", "http://51.20.114.126:3001"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://51.20.114.126:3001",
+    ],
     methods: ["GET", "POST"],
   },
 });

@@ -17,17 +17,18 @@
     "docker:logs": "docker-compose logs -f",
     "docker:logs:blue": "docker logs -f pingpong-blue",
     "docker:logs:green": "docker logs -f pingpong-green",
-    "deploy:status": "node --loader ts-node/esm deploy-simulator.ts status",
-    "deploy:blue": "node --loader ts-node/esm deploy-simulator.ts deploy blue",
-    "deploy:green": "node --loader ts-node/esm deploy-simulator.ts deploy green",
-    "deploy:switch": "node --loader ts-node/esm deploy-simulator.ts switch",
-    "deploy:simulate": "node --loader ts-node/esm deploy-simulator.ts simulate"
+    "deploy:status": "node deploy-simulator.js status",
+    "deploy:blue": "node deploy-simulator.js deploy blue",
+    "deploy:green": "node deploy-simulator.js deploy green",
+    "deploy:switch": "node deploy-simulator.js switch",
+    "deploy:simulate": "node deploy-simulator.js simulate"
   },
   "workspaces": [
     "server",
     "client"
   ],
   "devDependencies": {
+    "node-fetch": "^3.3.2",
     "ts-node": "^10.9.2"
   },
   "keywords": [

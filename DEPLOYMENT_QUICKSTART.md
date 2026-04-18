@@ -317,13 +317,13 @@ kill -9 <PID>
 
 ## Key Endpoints
 
-| Endpoint | Purpose | Blue | Green |
-|----------|---------|------|-------|
-| `/health` | Quick health check | :3001 | :3002 |
-| `/health/live` | Liveness probe | :3001 | :3002 |
-| `/health/ready` | Readiness probe | :3001 | :3002 |
-| `/status` | Load balancer status | :3000 | :3000 |
-| `/` | Main app | :3000 | :3000 |
+| Endpoint        | Purpose              | Blue  | Green |
+| --------------- | -------------------- | ----- | ----- |
+| `/health`       | Quick health check   | :3001 | :3002 |
+| `/health/live`  | Liveness probe       | :3001 | :3002 |
+| `/health/ready` | Readiness probe      | :3001 | :3002 |
+| `/status`       | Load balancer status | :3000 | :3000 |
+| `/`             | Main app             | :3000 | :3000 |
 
 ## Metrics to Track
 
@@ -331,7 +331,7 @@ kill -9 <PID>
 ✅ **Health Check Pass Rate**: 100%  
 ✅ **Rollback Time**: < 30 seconds  
 ✅ **Zero Downtime**: Yes  
-✅ **Error Rate Post-Deploy**: No increase  
+✅ **Error Rate Post-Deploy**: No increase
 
 ## Next Steps
 

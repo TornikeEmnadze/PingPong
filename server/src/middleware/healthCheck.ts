@@ -1,8 +1,3 @@
-/**
- * Health Check Middleware
- * Provides a simple health check endpoint for deployment monitoring
- */
-
 import { Express } from "express";
 
 export function setupHealthCheck(app: Express): void {

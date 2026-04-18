@@ -1,8 +1,3 @@
-/**
- * Blue-Green Deployment Configuration
- * This file manages the configuration for blue-green deployments
- */
-
 export interface DeploymentConfig {
   bluePort: number;
   greenPort: number;
