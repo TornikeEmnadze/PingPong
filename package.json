@@ -1,0 +1,44 @@
+{
+  "name": "pingpong-game",
+  "version": "1.0.0",
+  "description": "Multiplayer Ping Pong game with Express backend and React frontend",
+  "private": true,
+  "scripts": {
+    "install:all": "npm ci && cd server && npm ci && cd ../client && npm ci",
+    "dev": "npm run dev --workspace=server & npm run dev --workspace=client",
+    "build": "npm run build --workspace=server && npm run build --workspace=client",
+    "test": "npm run test --workspace=server && npm run test --workspace=client",
+    "test:watch": "npm run test:watch --workspace=server",
+    "test:coverage": "npm run test:coverage --workspace=server && npm run test:coverage --workspace=client",
+    "lint": "npm run lint --workspace=client",
+    "docker:build": "docker build -t pingpong:latest .",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:logs:blue": "docker logs -f pingpong-blue",
+    "docker:logs:green": "docker logs -f pingpong-green",
+    "deploy:status": "node --loader ts-node/esm deploy-simulator.ts status",
+    "deploy:blue": "node --loader ts-node/esm deploy-simulator.ts deploy blue",
+    "deploy:green": "node --loader ts-node/esm deploy-simulator.ts deploy green",
+    "deploy:switch": "node --loader ts-node/esm deploy-simulator.ts switch",
+    "deploy:simulate": "node --loader ts-node/esm deploy-simulator.ts simulate"
+  },
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  },
+  "keywords": [
+    "pingpong",
+    "game",
+    "multiplayer",
+    "react",
+    "express",
+    "socket.io"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import path from "path";
 import { Game } from "./models/Game";
+import { setupHealthCheck } from "./middleware/healthCheck";
 import {
   ServerToClientEvents,
   ClientToServerEvents,
@@ -16,6 +17,9 @@ const clientBuildPath = path.join(__dirname, "..", "..", "client", "dist");
 
 console.log(`Serving client static files from: ${clientBuildPath}`);
 app.use(express.static(clientBuildPath));
+
+// Setup health check endpoints
+setupHealthCheck(app);
 
 // Replace the problematic wildcard route
 app.get('/', (req, res) => {

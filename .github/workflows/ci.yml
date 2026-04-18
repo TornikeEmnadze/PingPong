@@ -31,7 +31,7 @@ jobs:
       - name: Test server
         run: cd server && npm test -- --coverage
 
-      # Upload coverage reports (optional)
+      # Upload coverage reports
       - name: Upload server coverage
         if: always()
         uses: codecov/codecov-action@v4
@@ -40,15 +40,95 @@ jobs:
           flags: server
 
   build:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "18"
+
       - name: Build client
         run: cd client && npm ci && npm run build
+
       - name: Build server
         run: cd server && npm ci && npm run build
+
+      # Build Docker images
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false
+          tags: pingpong:latest
+          cache-from: type=registry,ref=pingpong:buildcache
+          cache-to: type=registry,ref=pingpong:buildcache,mode=max
+
+      # Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            server/dist
+            client/dist
+          retention-days: 7
+
+  # Blue-Green Deployment (only on main push)
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        environment: [green]  # Deploy to green first
+    environment:
+      name: production-${{ matrix.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+
+      - name: Deploy to ${{ matrix.environment }} environment
+        run: |
+          echo "Deploying to ${{ matrix.environment }} environment..."
+          echo "Version: ${{ github.sha }}"
+          echo "Build number: ${{ github.run_number }}"
+
+          # In production, you would:
+          # 1. Connect to your infrastructure (AWS, GCP, etc.)
+          # 2. Deploy to the inactive environment
+          # 3. Run health checks and smoke tests
+          # 4. If successful, switch traffic
+          # 5. If failed, keep old environment active
+
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests on ${{ matrix.environment }}..."
+          # Add your smoke test commands here
+
+      - name: Switch traffic (if tests pass)
+        if: success()
+        run: |
+          echo "Switching traffic to ${{ matrix.environment }} environment..."
+          # Update load balancer or infrastructure configuration
+
+      - name: Verify deployment
+        if: success()
+        run: |
+          echo "✅ Deployment to ${{ matrix.environment }} successful"
+          echo "Services are now live: https://your-domain.com"
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed - rolling back to previous environment"
+          # Revert traffic to previous environment
+
