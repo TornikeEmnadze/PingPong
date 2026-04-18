@@ -7,7 +7,7 @@ This document outlines the branch protection rules that should be configured in 
 ✅ Prevents failed tests from being merged  
 ✅ Requires code review before merging  
 ✅ Ensures CI/CD pipeline passes  
-✅ Protects main branch from accidental direct pushes  
+✅ Protects main branch from accidental direct pushes
 
 ## Recommended Configuration
 
@@ -18,6 +18,7 @@ Go to **Settings → Branches → Branch protection rules**
 Create a rule for `main` with these settings:
 
 #### ✅ Required Checks
+
 - [x] **Require status checks to pass before merging**
   - Status checks that must pass:
     - `test` - All tests must pass
@@ -28,24 +29,29 @@ Create a rule for `main` with these settings:
   - Ensures your branch is up-to-date with main before merging
 
 #### ✅ Require Code Review
+
 - [x] **Require pull request reviews before merging**
   - Minimum: 1 required reviewer
   - [x] Dismiss stale pull request approvals when new commits are pushed
   - [x] Require review from Code Owners (if using CODEOWNERS file)
 
 #### ✅ Require Conversation Resolution
+
 - [x] **Require all conversations on pull requests to be resolved before merging**
   - Ensures all comments are addressed
 
 #### ✅ Require Signed Commits
+
 - [x] **Require signed commits**
   - Ensures commit authenticity (optional but recommended)
 
 #### ✅ Dismiss Stale Reviews
+
 - [x] **Dismiss stale pull request approvals when new commits are pushed**
   - Reviewers must re-approve after code changes
 
 #### ✅ Require Status Checks
+
 - [x] **Require status checks to pass before merging**
 - [x] **Require branches to be up to date before merging**
 
@@ -96,7 +102,7 @@ After merge to main:
 ❌ **Status check failures** - Pipeline-status job fails  
 ❌ **Missing approvals** - Needs code review  
 ❌ **Stale branch** - Must be up-to-date with main  
-❌ **Unresolved conversations** - All comments must be addressed  
+❌ **Unresolved conversations** - All comments must be addressed
 
 ## GitHub Settings
 
@@ -212,7 +218,7 @@ Add a `CODEOWNERS` file to require specific reviewer approval:
 # Server changes require @backend-dev
 /server/ @backend-dev
 
-# Client changes require @frontend-dev  
+# Client changes require @frontend-dev
 /client/ @frontend-dev
 
 # Tests must be reviewed
