@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { GameState, GAME_CONFIG } from "../../shared/types/events";
 
 interface GameBoardProps {
@@ -6,7 +6,7 @@ interface GameBoardProps {
   playerId: string | null;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ gameState, playerId }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ gameState }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameState, playerId }) => {
         paddleX,
         player.paddleY,
         GAME_CONFIG.PADDLE_WIDTH,
-        GAME_CONFIG.PADDLE_HEIGHT
+        GAME_CONFIG.PADDLE_HEIGHT,
       );
     });
 
@@ -51,7 +51,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameState, playerId }) => {
       gameState.ball.position.x,
       gameState.ball.position.y,
       GAME_CONFIG.BALL_SIZE,
-      GAME_CONFIG.BALL_SIZE
+      GAME_CONFIG.BALL_SIZE,
     );
   }, [gameState]);
 
