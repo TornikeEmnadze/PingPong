@@ -3,6 +3,8 @@ name: CI/CD
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -14,13 +16,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
+
+      # Client tests and linting
       - name: Install client dependencies
         run: cd client && npm ci
       - name: Lint client
         run: cd client && npm run lint
+      - name: Test client
+        run: cd client && npm test -- --run
+
+      # Server tests
       - name: Install server dependencies
         run: cd server && npm ci
-      # No tests defined for server yet
+      - name: Test server
+        run: cd server && npm test -- --coverage
+
+      # Upload coverage reports (optional)
+      - name: Upload server coverage
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./server/coverage/coverage-final.json
+          flags: server
 
   build:
     if: github.event_name == 'workflow_dispatch'
