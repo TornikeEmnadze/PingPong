@@ -106,7 +106,7 @@ jobs:
             client/dist
           retention-days: 7
 
-    deploy:
+  deploy:
     name: Blue-Green Deploy to Vercel
     runs-on: ubuntu-latest
     needs: build
@@ -168,7 +168,7 @@ jobs:
           echo "Previous production deployment = BLUE."
           echo "New verified deployment = GREEN."
           echo "GREEN was promoted only after smoke testing passed."
-          
+
   pipeline-status:
     name: Pipeline Status Check
     runs-on: ubuntu-latest
