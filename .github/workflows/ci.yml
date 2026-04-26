@@ -111,8 +111,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
 
-    # Deploy only after push to main.
-    # Pull requests run tests/build but do not deploy.
+    # Deploy only after code is pushed/merged into main.
+    # Pull requests run tests and build, but they do not deploy.
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     environment:
@@ -132,7 +132,6 @@ jobs:
 
       - name: Deploy Green environment without switching production traffic
         id: deploy_green
-        working-directory: client
         run: |
           echo "Deploying new version as GREEN environment..."
           DEPLOYMENT_URL=$(vercel deploy --prod --skip-domain --yes --token=${{ secrets.VERCEL_TOKEN }})
@@ -153,7 +152,6 @@ jobs:
           echo "✅ Smoke test passed. Green deployment is healthy."
 
       - name: Promote Green deployment to Production
-        working-directory: client
         run: |
           echo "Promoting GREEN deployment to production..."
           vercel promote "${{ steps.deploy_green.outputs.deployment_url }}" --yes --token=${{ secrets.VERCEL_TOKEN }}
